@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>アイコン変換ツール</title>
+    <style>
+      body {
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        background-color: #f5f0e8;
+        color: #1a1a4b;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .icon-preview {
+        display: inline-block;
+        margin: 10px;
+        border: 2px solid #1a1a4b;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: white;
+      }
+      .size-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #ff8c42;
+      }
+      canvas {
+        border: 1px solid #a2865c;
+      }
+      .instructions {
+        background-color: #a2865c;
+        color: #f5f0e8;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+      .download-btn {
+        background-color: #ff8c42;
+        color: #f5f0e8;
+        border: 2px solid #1a1a4b;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: bold;
+        margin: 5px;
+      }
+      .download-btn:hover {
+        background-color: #e03e36;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Chrome拡張アイコン変換ツール</h1>
+
+      <div class="instructions">
+        <h3>使い方:</h3>
+        <ol>
+          <li>このページを開いたら、各サイズのアイコンが自動で生成されます</li>
+          <li>
+            「ダウンロード」ボタンをクリックして、各サイズのPNGファイルを保存してください
+          </li>
+          <li>保存したファイルを拡張機能のフォルダに配置してください</li>
+        </ol>
+      </div>
+
+      <div class="preview-section">
+        <div class="icon-preview">
+          <div class="size-label">16x16px (ツールバー)</div>
+          <canvas id="canvas16" width="16" height="16"></canvas>
+          <br />
+          <button class="download-btn" onclick="downloadIcon(16)">
+            ダウンロード
+          </button>
+        </div>
+
+        <div class="icon-preview">
+          <div class="size-label">32x32px (Windows)</div>
+          <canvas id="canvas32" width="32" height="32"></canvas>
+          <br />
+          <button class="download-btn" onclick="downloadIcon(32)">
+            ダウンロード
+          </button>
+        </div>
+
+        <div class="icon-preview">
+          <div class="size-label">48x48px (拡張管理ページ)</div>
+          <canvas id="canvas48" width="48" height="48"></canvas>
+          <br />
+          <button class="download-btn" onclick="downloadIcon(48)">
+            ダウンロード
+          </button>
+        </div>
+
+        <div class="icon-preview">
+          <div class="size-label">128x128px (Chromeウェブストア)</div>
+          <canvas id="canvas128" width="128" height="128"></canvas>
+          <br />
+          <button class="download-btn" onclick="downloadIcon(128)">
+            ダウンロード
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const svgData = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+      <rect x="0" y="0" width="128" height="128" fill="#F5F0E8" stroke="#1A1A4B" stroke-width="3" rx="12" ry="8"/>
+      <text x="35" y="70" font-family="Comic Sans MS, cursive" font-size="48" font-weight="bold" fill="#1A1A4B" transform="rotate(-2)">A</text>
+      <text x="75" y="85" font-family="Comic Sans MS, cursive" font-size="24" font-weight="normal" fill="#555555" transform="rotate(3)">A</text>
+      <path d="M 20 90 Q 30 85 40 88 Q 50 92 60 87 Q 70 82 85 85" stroke="#FF8C42" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="95" cy="25" r="3" fill="#E03E36" transform="rotate(15)"/>
+      <circle cx="25" cy="30" r="2" fill="#FF8C42"/>
+      <circle cx="105" cy="45" r="2.5" fill="#A2865C"/>
+      <g transform="translate(85, 15) scale(0.8)">
+        <circle cx="10" cy="10" r="8" fill="none" stroke="#1A1A4B" stroke-width="2"/>
+        <circle cx="10" cy="10" r="3" fill="#FF8C42"/>
+        <rect x="8" y="2" width="4" height="6" fill="#1A1A4B" rx="1"/>
+        <rect x="8" y="20" width="4" height="6" fill="#1A1A4B" rx="1"/>
+        <rect x="2" y="8" width="6" height="4" fill="#1A1A4B" ry="1"/>
+        <rect x="20" y="8" width="6" height="4" fill="#1A1A4B" ry="1"/>
+      </g>
+    </svg>`;
+
+      const generateIcon = (size) => {
+        const canvas = document.getElementById(`canvas${size}`);
+        const ctx = canvas.getContext("2d");
+
+        const img = new Image();
+        const svgBlob = new Blob([svgData], { type: "image/svg+xml" });
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = () => {
+          ctx.clearRect(0, 0, size, size);
+          ctx.drawImage(img, 0, 0, size, size);
+          URL.revokeObjectURL(url);
+        };
+
+        img.src = url;
+      };
+
+      const downloadIcon = (size) => {
+        const canvas = document.getElementById(`canvas${size}`);
+        const link = document.createElement("a");
+        link.download = `icon${size}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      };
+
+      // ページ読み込み時に全サイズのアイコンを生成
+      window.onload = () => {
+        [16, 32, 48, 128].forEach((size) => {
+          setTimeout(() => generateIcon(size), 100);
+        });
+      };
+    </script>
+  </body>
+</html>

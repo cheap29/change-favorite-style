@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Style Changer</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">スタイル変更</h1>
+
+      <!-- ON/OFFスイッチ -->
+      <div class="switch-section">
+        <label class="switch-label">
+          <span class="switch-text">スタイル適用</span>
+          <div class="switch-container">
+            <input type="checkbox" id="style-toggle" class="switch-input" />
+            <span class="switch-slider"></span>
+          </div>
+        </label>
+      </div>
+
+      <!-- ステータス表示 -->
+      <div class="status-section">
+        <span id="status-text" class="status-text">未適用</span>
+      </div>
+
+      <!-- フォント設定 -->
+      <div class="settings-section" id="settings-section">
+        <!-- フォントファミリー -->
+        <div class="setting-group">
+          <label for="font-family" class="setting-label">フォント</label>
+          <select id="font-family" class="setting-select">
+            <option value="inherit">デフォルト</option>
+            <option value="serif">明朝体</option>
+            <option value="sans-serif">ゴシック体</option>
+            <option value="monospace">等幅</option>
+            <option value="cursive">筆記体</option>
+            <option value="fantasy">装飾体</option>
+            <option value="custom">カスタム</option>
+          </select>
+          <div
+            class="custom-font-container"
+            id="custom-font-container"
+            style="display: none"
+          >
+            <input
+              type="text"
+              id="custom-font-name"
+              class="custom-font-input"
+              placeholder="フォント名を入力 (例: Arial, Meiryo)"
+              maxlength="100"
+            />
+            <div class="font-hint">例: Arial, Yu Gothic, Meiryo, MS Gothic</div>
+          </div>
+        </div>
+
+        <!-- フォントサイズ -->
+        <div class="setting-group">
+          <label for="font-size" class="setting-label">サイズ</label>
+          <div class="range-container">
+            <input
+              type="range"
+              id="font-size"
+              class="setting-range"
+              min="10"
+              max="36"
+              value="16"
+            />
+            <span id="font-size-value" class="range-value">16px</span>
+          </div>
+        </div>
+
+        <!-- フォントウェイト -->
+        <div class="setting-group">
+          <label for="font-weight" class="setting-label">太さ</label>
+          <select id="font-weight" class="setting-select">
+            <option value="normal">標準</option>
+            <option value="bold">太字</option>
+            <option value="lighter">細字</option>
+            <option value="100">100</option>
+            <option value="300">300</option>
+            <option value="500">500</option>
+            <option value="700">700</option>
+            <option value="900">900</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
