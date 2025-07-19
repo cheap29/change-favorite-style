@@ -1,5 +1,6 @@
 // DOM要素の取得
 const styleToggle = document.getElementById("style-toggle");
+const darkenToggle = document.getElementById("darken-toggle");
 const statusText = document.getElementById("status-text");
 const settingsSection = document.getElementById("settings-section");
 const fontFamily = document.getElementById("font-family");
@@ -12,6 +13,7 @@ const customFontName = document.getElementById("custom-font-name");
 // デフォルト設定
 const defaultSettings = {
   enabled: false,
+  darkenEnabled: false,
   fontFamily: "inherit",
   fontSize: 16,
   fontWeight: "normal",
@@ -27,6 +29,7 @@ const loadSettings = async () => {
 
     // UIに設定を反映
     styleToggle.checked = settings.enabled;
+    darkenToggle.checked = settings.darkenEnabled;
     fontFamily.value = settings.selectedFontFamily || settings.fontFamily;
     fontSize.value = settings.fontSize;
     fontWeight.value = settings.fontWeight;
@@ -93,8 +96,58 @@ const sendMessageToTab = async (message) => {
       active: true,
       currentWindow: true,
     });
-    if (tab && tab.id) {
+
+    if (!tab || !tab.id) {
+      console.log("アクティブなタブが見つかりません");
+      return;
+    }
+
+    // chrome:// や extension:// などの特殊なページではスキップ
+    if (
+      tab.url &&
+      (tab.url.startsWith("chrome://") ||
+        tab.url.startsWith("chrome-extension://") ||
+        tab.url.startsWith("edge://") ||
+        tab.url.startsWith("about:"))
+    ) {
+      console.log(
+        "この種類のページではスタイル変更はサポートされていません:",
+        tab.url
+      );
+      return;
+    }
+
+    try {
+      // メッセージを送信
       await chrome.tabs.sendMessage(tab.id, message);
+      console.log("メッセージを送信しました:", message);
+    } catch (messageError) {
+      // content script が存在しない場合は手動で注入
+      if (messageError.message.includes("Could not establish connection")) {
+        console.log("content scriptを注入します...");
+
+        try {
+          // content script を注入
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ["content.js"],
+          });
+
+          // 少し待ってから再度メッセージを送信
+          setTimeout(async () => {
+            try {
+              await chrome.tabs.sendMessage(tab.id, message);
+              console.log("注入後にメッセージを送信しました:", message);
+            } catch (retryError) {
+              console.error("再送信も失敗しました:", retryError);
+            }
+          }, 100);
+        } catch (injectError) {
+          console.error("content scriptの注入に失敗しました:", injectError);
+        }
+      } else {
+        throw messageError;
+      }
     }
   } catch (error) {
     console.error("タブへのメッセージ送信に失敗しました:", error);
@@ -105,6 +158,7 @@ const sendMessageToTab = async (message) => {
 const applySettings = async () => {
   const settings = {
     enabled: styleToggle.checked,
+    darkenEnabled: darkenToggle.checked,
     fontFamily: getEffectiveFontFamily(),
     fontSize: parseInt(fontSize.value),
     fontWeight: fontWeight.value,
@@ -122,10 +176,35 @@ const applySettings = async () => {
   });
 };
 
+// 背景を暗くする設定を即座に適用
+const applyDarkenSettings = async () => {
+  // 現在のUI状態から設定を作成
+  const updatedSettings = {
+    enabled: styleToggle.checked,
+    darkenEnabled: darkenToggle.checked,
+    fontFamily: getEffectiveFontFamily(),
+    fontSize: parseInt(fontSize.value),
+    fontWeight: fontWeight.value,
+    customFontName: customFontName.value.trim(),
+    selectedFontFamily: fontFamily.value,
+  };
+
+  await saveSettings(updatedSettings);
+
+  // content scriptに背景設定を送信（即座に反映）
+  await sendMessageToTab({
+    action: "applyDarkenStyle",
+    settings: updatedSettings,
+  });
+};
+
 // イベントリスナーの設定
 const setupEventListeners = () => {
   // ON/OFFスイッチ
   styleToggle.addEventListener("change", applySettings);
+
+  // 背景を暗くするスイッチ（即座に反映）
+  darkenToggle.addEventListener("change", applyDarkenSettings);
 
   // フォントファミリー
   fontFamily.addEventListener("change", () => {

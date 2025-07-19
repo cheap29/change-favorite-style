@@ -39,10 +39,10 @@ cd change-favorite-style
 
 1. `convert-icons.html` をブラウザで開く
 2. 各サイズのアイコンをダウンロード：
-   - icon16.png (16×16px)
-   - icon32.png (32×32px)
-   - icon48.png (48×48px)
-   - icon128.png (128×128px)
+   - img/icon16.png (16×16px)
+   - img/icon32.png (32×32px)
+   - img/icon48.png (48×48px)
+   - img/icon128.png (128×128px)
 3. ダウンロードした PNG ファイルをプロジェクトフォルダに配置
 
 ### 3. Chrome に拡張機能をインストール
@@ -87,10 +87,11 @@ change-favorite-style/
 ├── popup.css              # 手描き風スタイル
 ├── popup.js               # UI操作・設定管理
 ├── content.js             # ページスタイル変更
-├── icon16.png             # 16×16pxアイコン
-├── icon32.png             # 32×32pxアイコン
-├── icon48.png             # 48×48pxアイコン
-├── icon128.png            # 128×128pxアイコン
+├── img/                   # アイコンフォルダ
+│   ├── icon16.png         # 16×16pxアイコン
+│   ├── icon32.png         # 32×32pxアイコン
+│   ├── icon48.png         # 48×48pxアイコン
+│   └── icon128.png        # 128×128pxアイコン
 ├── icon-template.svg      # アイコンSVGテンプレート
 ├── convert-icons.html     # アイコン変換ツール
 └── README.md             # このファイル

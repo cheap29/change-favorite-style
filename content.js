@@ -1,11 +1,51 @@
 // スタイル要素のID
 const STYLE_ID = "style-changer-custom-styles";
+const DARKEN_STYLE_ID = "style-changer-darken-background";
 
 // 現在適用中の設定
 let currentSettings = null;
 
-// カスタムスタイルを作成
-const createCustomStyle = (settings) => {
+// 背景色を暗くする処理
+const darkenBackgroundColor = () => {
+  const body = document.body;
+  const computedStyle = window.getComputedStyle(body);
+  let currentBgColor = computedStyle.backgroundColor;
+
+  // 背景色が透明または未設定の場合は白を基準にする
+  if (
+    currentBgColor === "rgba(0, 0, 0, 0)" ||
+    currentBgColor === "transparent" ||
+    !currentBgColor
+  ) {
+    currentBgColor = "rgb(255, 255, 255)";
+  }
+
+  // RGB値を抽出
+  const rgbMatch = currentBgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (rgbMatch) {
+    const r = Math.max(0, parseInt(rgbMatch[1]) - 16); // 16減らす（#ff → #ef）
+    const g = Math.max(0, parseInt(rgbMatch[2]) - 16);
+    const b = Math.max(0, parseInt(rgbMatch[3]) - 16);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  // HEX形式の場合の処理も追加
+  if (currentBgColor.startsWith("#")) {
+    const hex = currentBgColor.slice(1);
+    if (hex.length === 6) {
+      const r = Math.max(0, parseInt(hex.slice(0, 2), 16) - 16);
+      const g = Math.max(0, parseInt(hex.slice(2, 4), 16) - 16);
+      const b = Math.max(0, parseInt(hex.slice(4, 6), 16) - 16);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+  }
+
+  // フォールバック: うすいグレー
+  return "#efefef";
+};
+
+// フォントスタイルを作成
+const createFontStyle = (settings) => {
   if (!settings.enabled) {
     return "";
   }
@@ -31,26 +71,65 @@ const createCustomStyle = (settings) => {
   `;
 };
 
-// スタイルを適用
-const applyStyle = (settings) => {
-  // 既存のスタイル要素を削除
+// 背景を暗くするスタイルを作成
+const createDarkenStyle = (settings) => {
+  if (!settings.darkenEnabled) {
+    return "";
+  }
+
+  const darkenedColor = darkenBackgroundColor();
+  console.log("darkenedColor", darkenedColor);
+  return `
+    body {
+      background-color: ${darkenedColor} !important;
+    }
+  `;
+};
+
+// フォントスタイルを適用
+const applyFontStyle = (settings) => {
+  // 既存のフォントスタイル要素を削除
   const existingStyle = document.getElementById(STYLE_ID);
   if (existingStyle) {
     existingStyle.remove();
   }
 
-  // 新しいスタイルを適用
+  // 新しいフォントスタイルを適用
   if (settings.enabled) {
     const styleElement = document.createElement("style");
     styleElement.id = STYLE_ID;
-    styleElement.textContent = createCustomStyle(settings);
+    styleElement.textContent = createFontStyle(settings);
     document.head.appendChild(styleElement);
-
-    console.log("スタイルを適用しました:", settings);
+    console.log("フォントスタイルを適用しました:", settings);
   } else {
-    console.log("スタイルを無効にしました");
+    console.log("フォントスタイルを無効にしました");
+  }
+};
+
+// 背景を暗くするスタイルを適用
+const applyDarkenStyle = (settings) => {
+  // 既存の背景スタイル要素を削除
+  const existingDarkenStyle = document.getElementById(DARKEN_STYLE_ID);
+  if (existingDarkenStyle) {
+    existingDarkenStyle.remove();
   }
 
+  // 新しい背景スタイルを適用
+  if (settings.darkenEnabled) {
+    const darkenStyleElement = document.createElement("style");
+    darkenStyleElement.id = DARKEN_STYLE_ID;
+    darkenStyleElement.textContent = createDarkenStyle(settings);
+    document.head.appendChild(darkenStyleElement);
+    console.log("背景を暗くしました");
+  } else {
+    console.log("背景の暗化を無効にしました");
+  }
+};
+
+// 全てのスタイルを適用
+const applyAllStyles = (settings) => {
+  applyFontStyle(settings);
+  applyDarkenStyle(settings);
   currentSettings = settings;
 };
 
@@ -61,7 +140,7 @@ const loadSettings = async () => {
     const settings = result.styleSettings;
 
     if (settings) {
-      applyStyle(settings);
+      applyAllStyles(settings);
     }
   } catch (error) {
     console.error("設定の読み込みに失敗しました:", error);
@@ -71,7 +150,13 @@ const loadSettings = async () => {
 // メッセージリスナー
 const handleMessage = (message, sender, sendResponse) => {
   if (message.action === "applyStyle") {
-    applyStyle(message.settings);
+    applyAllStyles(message.settings);
+    sendResponse({ success: true });
+  } else if (message.action === "applyFontStyle") {
+    applyFontStyle(message.settings);
+    sendResponse({ success: true });
+  } else if (message.action === "applyDarkenStyle") {
+    applyDarkenStyle(message.settings);
     sendResponse({ success: true });
   }
 
@@ -93,9 +178,13 @@ const observePageChanges = () => {
         )
     );
 
-    if (hasSignificantChanges && currentSettings && currentSettings.enabled) {
+    if (
+      hasSignificantChanges &&
+      currentSettings &&
+      (currentSettings.enabled || currentSettings.darkenEnabled)
+    ) {
       // 少し遅延してスタイルを再適用
-      setTimeout(() => applyStyle(currentSettings), 100);
+      setTimeout(() => applyAllStyles(currentSettings), 100);
     }
   });
 
@@ -110,7 +199,7 @@ const handleStorageChange = (changes, areaName) => {
   if (areaName === "local" && changes.styleSettings) {
     const newSettings = changes.styleSettings.newValue;
     if (newSettings) {
-      applyStyle(newSettings);
+      applyAllStyles(newSettings);
     }
   }
 };
