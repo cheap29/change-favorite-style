@@ -1,8 +1,8 @@
 body {
   margin: 0;
   padding: 0;
-  width: 320px;
-  min-height: 400px;
+  width: 340px;
+  min-height: 520px;
   background-color: #f5f0e8;
   font-family: "Comic Sans MS", cursive, sans-serif;
   color: #1a1a4b;
@@ -94,7 +94,7 @@ body {
 /* ステータスセクション */
 .status-section {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .status-text {
@@ -110,6 +110,45 @@ body {
 
 .status-text.active {
   background-color: #ff8c42;
+}
+
+.status-text.paused {
+  background-color: #555555;
+}
+
+/* サイト別設定 */
+.site-section {
+  background-color: #f5f0e8;
+  color: #1a1a4b;
+  padding: 10px 12px;
+  border: 2px solid #1a1a4b;
+  border-radius: 6px 8px 5px 9px;
+  margin-bottom: 15px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.site-host {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.site-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.site-toggle-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: #ff8c42;
 }
 
 /* 設定セクション */

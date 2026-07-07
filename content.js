@@ -1,5 +1,124 @@
+(() => {
+if (globalThis.__styleChangerInitialized) {
+  return;
+}
+
+globalThis.__styleChangerInitialized = true;
+
 // スタイル要素のID
 const STYLE_ID = "style-changer-custom-styles";
+
+const DEFAULT_SETTINGS = {
+  enabled: false,
+  fontFamily: "inherit",
+  fontSize: 16,
+  fontWeight: "normal",
+  lineHeight: 1.6,
+  letterSpacing: 0,
+  disabledHosts: [],
+};
+
+const GENERIC_FONT_FAMILIES = new Set([
+  "inherit",
+  "serif",
+  "sans-serif",
+  "monospace",
+  "cursive",
+  "fantasy",
+  "system-ui",
+  "ui-serif",
+  "ui-sans-serif",
+  "ui-monospace",
+]);
+
+const ALLOWED_FONT_WEIGHTS = new Set([
+  "normal",
+  "bold",
+  "lighter",
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+]);
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const normalizeHost = (value) => {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value.toLowerCase().replace(/^www\./, "").trim();
+};
+
+const normalizeFontFamily = (value) => {
+  if (typeof value !== "string") {
+    return DEFAULT_SETTINGS.fontFamily;
+  }
+
+  const families = value
+    .split(",")
+    .map((family) => family.trim().replace(/^["']|["']$/g, ""))
+    .filter(Boolean)
+    .slice(0, 5);
+
+  const normalizedFamilies = families
+    .map((family) => {
+      const lowerFamily = family.toLowerCase();
+      if (GENERIC_FONT_FAMILIES.has(lowerFamily)) {
+        return lowerFamily;
+      }
+
+      if (/^[\p{L}\p{N}\s._-]{1,64}$/u.test(family)) {
+        return `"${family}"`;
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+
+  return normalizedFamilies.length
+    ? normalizedFamilies.join(", ")
+    : DEFAULT_SETTINGS.fontFamily;
+};
+
+const normalizeSettings = (settings = {}) => {
+  const fontSize = Number.parseInt(settings.fontSize, 10);
+  const lineHeight = Number.parseFloat(settings.lineHeight);
+  const letterSpacing = Number.parseFloat(settings.letterSpacing);
+  const fontWeight = String(settings.fontWeight || DEFAULT_SETTINGS.fontWeight);
+  const disabledHosts = Array.isArray(settings.disabledHosts)
+    ? [...new Set(settings.disabledHosts.map(normalizeHost).filter(Boolean))]
+    : [];
+
+  return {
+    enabled: Boolean(settings.enabled),
+    fontFamily: normalizeFontFamily(settings.fontFamily),
+    fontSize: Number.isFinite(fontSize)
+      ? clamp(fontSize, 10, 36)
+      : DEFAULT_SETTINGS.fontSize,
+    fontWeight: ALLOWED_FONT_WEIGHTS.has(fontWeight)
+      ? fontWeight
+      : DEFAULT_SETTINGS.fontWeight,
+    lineHeight: Number.isFinite(lineHeight)
+      ? clamp(lineHeight, 1, 2.2)
+      : DEFAULT_SETTINGS.lineHeight,
+    letterSpacing: Number.isFinite(letterSpacing)
+      ? clamp(letterSpacing, 0, 3)
+      : DEFAULT_SETTINGS.letterSpacing,
+    disabledHosts,
+  };
+};
+
+const isDisabledForCurrentSite = (settings) => {
+  const currentHost = normalizeHost(window.location.hostname);
+  return Boolean(currentHost) && settings.disabledHosts.includes(currentHost);
+};
 
 // 現在適用中の設定
 let currentSettings = null;
@@ -10,18 +129,23 @@ const createCustomStyle = (settings) => {
     return "";
   }
 
-  const { fontFamily, fontSize, fontWeight } = settings;
+  const safeSettings = normalizeSettings(settings);
+  const { fontFamily, fontSize, fontWeight, lineHeight, letterSpacing } =
+    safeSettings;
 
   return `
-    * {
+    *:not(code):not(pre):not(.hljs):not([class*="code"]):not([class*="highlight"]):not([class*="material-icons"]):not([class*="material-symbols"]):not(.fa):not(.fas):not(.far):not(.fab) {
       font-family: ${fontFamily} !important;
       font-size: ${fontSize}px !important;
       font-weight: ${fontWeight} !important;
+      line-height: ${lineHeight} !important;
+      letter-spacing: ${letterSpacing}px !important;
     }
     
     /* 特定の要素は除外 */
     input, button, select, textarea {
       font-size: ${Math.max(12, fontSize - 2)}px !important;
+      line-height: ${Math.max(1.2, lineHeight - 0.1)} !important;
     }
     
     /* コードブロックなどは元のフォントファミリーを維持 */
@@ -33,6 +157,8 @@ const createCustomStyle = (settings) => {
 
 // スタイルを適用
 const applyStyle = (settings) => {
+  const safeSettings = normalizeSettings(settings);
+
   // 既存のスタイル要素を削除
   const existingStyle = document.getElementById(STYLE_ID);
   if (existingStyle) {
@@ -40,18 +166,18 @@ const applyStyle = (settings) => {
   }
 
   // 新しいスタイルを適用
-  if (settings.enabled) {
+  if (safeSettings.enabled && !isDisabledForCurrentSite(safeSettings)) {
     const styleElement = document.createElement("style");
     styleElement.id = STYLE_ID;
-    styleElement.textContent = createCustomStyle(settings);
-    document.head.appendChild(styleElement);
+    styleElement.textContent = createCustomStyle(safeSettings);
+    (document.head || document.documentElement).appendChild(styleElement);
 
-    console.log("スタイルを適用しました:", settings);
+    console.log("スタイルを適用しました:", safeSettings);
   } else {
     console.log("スタイルを無効にしました");
   }
 
-  currentSettings = settings;
+  currentSettings = safeSettings;
 };
 
 // 設定を読み込む
@@ -70,12 +196,12 @@ const loadSettings = async () => {
 
 // メッセージリスナー
 const handleMessage = (message, sender, sendResponse) => {
-  if (message.action === "applyStyle") {
+  if (message && message.action === "applyStyle") {
     applyStyle(message.settings);
     sendResponse({ success: true });
   }
 
-  return true; // 非同期レスポンスを示す
+  return false;
 };
 
 // ページの状態変化を監視（SPAサイト対応）
@@ -108,10 +234,7 @@ const observePageChanges = () => {
 // ストレージの変更を監視
 const handleStorageChange = (changes, areaName) => {
   if (areaName === "local" && changes.styleSettings) {
-    const newSettings = changes.styleSettings.newValue;
-    if (newSettings) {
-      applyStyle(newSettings);
-    }
+    applyStyle(changes.styleSettings.newValue || DEFAULT_SETTINGS);
   }
 };
 
@@ -136,3 +259,4 @@ const init = () => {
 
 // 初期化実行
 init();
+})();

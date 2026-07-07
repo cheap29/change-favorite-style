@@ -26,8 +26,29 @@
         <span id="status-text" class="status-text">未適用</span>
       </div>
 
+      <!-- サイト別設定 -->
+      <div class="site-section" id="site-section">
+        <div class="site-host" id="site-host">現在のサイト</div>
+        <label class="site-toggle-label">
+          <input type="checkbox" id="site-disabled" />
+          <span>このサイトでは無効</span>
+        </label>
+      </div>
+
       <!-- フォント設定 -->
       <div class="settings-section" id="settings-section">
+        <!-- プリセット -->
+        <div class="setting-group">
+          <label for="preset-select" class="setting-label">プリセット</label>
+          <select id="preset-select" class="setting-select">
+            <option value="custom">カスタム</option>
+            <option value="balanced">読みやすさ重視</option>
+            <option value="large">大きめ</option>
+            <option value="bold">太め</option>
+            <option value="mono">等幅</option>
+          </select>
+        </div>
+
         <!-- フォントファミリー -->
         <div class="setting-group">
           <label for="font-family" class="setting-label">フォント</label>
@@ -69,6 +90,40 @@
               value="16"
             />
             <span id="font-size-value" class="range-value">16px</span>
+          </div>
+        </div>
+
+        <!-- 行間 -->
+        <div class="setting-group">
+          <label for="line-height" class="setting-label">行間</label>
+          <div class="range-container">
+            <input
+              type="range"
+              id="line-height"
+              class="setting-range"
+              min="1.0"
+              max="2.2"
+              step="0.1"
+              value="1.6"
+            />
+            <span id="line-height-value" class="range-value">1.6</span>
+          </div>
+        </div>
+
+        <!-- 文字間隔 -->
+        <div class="setting-group">
+          <label for="letter-spacing" class="setting-label">文字間隔</label>
+          <div class="range-container">
+            <input
+              type="range"
+              id="letter-spacing"
+              class="setting-range"
+              min="0"
+              max="3"
+              step="0.1"
+              value="0"
+            />
+            <span id="letter-spacing-value" class="range-value">0px</span>
           </div>
         </div>
 

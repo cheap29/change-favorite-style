@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Style Changer Store Assets</title>
+    <style>
+      :root {
+        --ink: #1a1a4b;
+        --paper: #f5f0e8;
+        --brown: #a2865c;
+        --orange: #ff8c42;
+        --red: #e03e36;
+        --muted: #555555;
+        --line: rgba(26, 26, 75, 0.18);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: "Yu Gothic UI", "Meiryo", Arial, sans-serif;
+        color: var(--ink);
+        background: var(--paper);
+      }
+
+      .asset {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #f5f0e8 0%, #f8f3ea 52%, #efe5d7 100%);
+      }
+
+      .screen {
+        display: none;
+        width: 1280px;
+        height: 800px;
+        padding: 52px 64px;
+      }
+
+      [data-asset="screenshot1"] .screen-one,
+      [data-asset="screenshot2"] .screen-two,
+      [data-asset="screenshot3"] .screen-three {
+        display: block;
+      }
+
+      .promo {
+        display: none;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      [data-asset="promo-small"] .promo-small,
+      [data-asset="promo-marquee"] .promo-marquee {
+        display: block;
+      }
+
+      .topline {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+
+      .brand-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        background: #fff url("../icon128.png") center/cover no-repeat;
+        box-shadow: 0 14px 30px rgba(26, 26, 75, 0.18);
+      }
+
+      .brand-title {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: 0;
+        margin: 0;
+      }
+
+      .brand-subtitle {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .stage {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 34px;
+        align-items: stretch;
+      }
+
+      .browser {
+        border: 3px solid var(--ink);
+        border-radius: 10px;
+        background: #fffdf8;
+        box-shadow: 12px 14px 0 rgba(26, 26, 75, 0.13);
+        overflow: hidden;
+      }
+
+      .browser-bar {
+        height: 42px;
+        background: #e9dfd1;
+        border-bottom: 3px solid var(--ink);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 14px;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--red);
+        border: 2px solid var(--ink);
+      }
+
+      .dot:nth-child(2) {
+        background: var(--orange);
+      }
+
+      .dot:nth-child(3) {
+        background: #6bbf7c;
+      }
+
+      .urlbar {
+        flex: 1;
+        height: 24px;
+        margin-left: 10px;
+        border: 2px solid var(--ink);
+        border-radius: 14px;
+        background: #fffaf0;
+        color: var(--muted);
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+      }
+
+      .article {
+        padding: 38px 48px;
+        min-height: 580px;
+      }
+
+      .article-label {
+        display: inline-block;
+        background: var(--orange);
+        color: #fffaf0;
+        border: 2px solid var(--ink);
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-size: 14px;
+        font-weight: 800;
+        margin-bottom: 22px;
+      }
+
+      .article h2 {
+        font-size: 34px;
+        margin: 0 0 22px;
+        line-height: 1.35;
+      }
+
+      .article p {
+        width: 88%;
+        margin: 0 0 16px;
+        color: #2b2b52;
+      }
+
+      .before p {
+        font-family: "Times New Roman", serif;
+        font-size: 15px;
+        line-height: 1.18;
+        letter-spacing: -0.2px;
+        color: #4f4f4f;
+      }
+
+      .after p {
+        font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+        font-size: 22px;
+        line-height: 1.75;
+        letter-spacing: 0.35px;
+        font-weight: 500;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+      }
+
+      .mini-browser .article {
+        padding: 24px;
+        min-height: 420px;
+      }
+
+      .mini-browser .article h2 {
+        font-size: 24px;
+      }
+
+      .popup {
+        background: var(--paper);
+        border: 3px solid var(--ink);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 12px 14px 0 rgba(26, 26, 75, 0.13);
+      }
+
+      .popup h3 {
+        text-align: center;
+        margin: 0 0 18px;
+        font-size: 22px;
+      }
+
+      .switch-card,
+      .settings-card {
+        background: var(--brown);
+        border: 2px solid var(--ink);
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 14px;
+        color: var(--paper);
+      }
+
+      .switch-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 800;
+      }
+
+      .switch {
+        width: 58px;
+        height: 30px;
+        border-radius: 16px;
+        background: var(--orange);
+        border: 2px solid var(--ink);
+        position: relative;
+      }
+
+      .switch::after {
+        content: "";
+        position: absolute;
+        right: 3px;
+        top: 3px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 1px solid var(--ink);
+      }
+
+      .status {
+        display: inline-block;
+        margin: 0 auto 14px;
+        padding: 8px 18px;
+        background: var(--orange);
+        border: 2px solid var(--ink);
+        color: var(--paper);
+        border-radius: 999px;
+        font-weight: 800;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      .field {
+        margin-bottom: 13px;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--paper);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .select,
+      .range {
+        height: 34px;
+        border: 2px solid var(--ink);
+        background: #fffaf0;
+        color: var(--ink);
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .range {
+        justify-content: space-between;
+      }
+
+      .track {
+        height: 8px;
+        flex: 1;
+        margin-right: 10px;
+        background: linear-gradient(90deg, var(--orange) 0 68%, #e8d9c5 68%);
+        border: 2px solid var(--ink);
+        border-radius: 10px;
+      }
+
+      .site-card {
+        background: #fffaf0;
+        color: var(--ink);
+        border: 2px solid var(--ink);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 14px;
+      }
+
+      .checkbox {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border: 2px solid var(--ink);
+        background: var(--orange);
+        margin-right: 8px;
+        vertical-align: -2px;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 22px;
+      }
+
+      .feature {
+        background: #fffaf0;
+        border: 3px solid var(--ink);
+        border-radius: 10px;
+        padding: 16px 18px;
+        min-height: 96px;
+        box-shadow: 8px 9px 0 rgba(26, 26, 75, 0.1);
+      }
+
+      .feature strong {
+        display: block;
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+
+      .feature span {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.5;
+        font-weight: 700;
+      }
+
+      .site-demo {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 34px;
+      }
+
+      .message {
+        background: #fffaf0;
+        border: 3px solid var(--ink);
+        border-radius: 10px;
+        padding: 34px;
+        box-shadow: 12px 14px 0 rgba(26, 26, 75, 0.13);
+      }
+
+      .message h2 {
+        margin: 0 0 20px;
+        font-size: 40px;
+        line-height: 1.25;
+      }
+
+      .message p {
+        font-size: 22px;
+        line-height: 1.7;
+        margin: 0 0 18px;
+        font-weight: 600;
+      }
+
+      .pill-list {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+      }
+
+      .pill {
+        border: 2px solid var(--ink);
+        background: var(--orange);
+        color: #fffaf0;
+        border-radius: 999px;
+        padding: 9px 16px;
+        font-weight: 800;
+      }
+
+      .promo-small {
+        padding: 26px;
+        background: var(--ink);
+      }
+
+      .promo-card {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, var(--paper), #ecdcc8);
+        border: 4px solid #fffaf0;
+      }
+
+      .promo-icon {
+        position: absolute;
+        left: 28px;
+        top: 29px;
+        width: 92px;
+        height: 92px;
+        border-radius: 22px;
+        background: #fff url("../icon128.png") center/cover no-repeat;
+        box-shadow: 0 14px 24px rgba(26, 26, 75, 0.25);
+      }
+
+      .promo-small h1 {
+        position: absolute;
+        left: 138px;
+        top: 40px;
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .promo-small p {
+        position: absolute;
+        left: 138px;
+        top: 123px;
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.3;
+        font-weight: 800;
+        color: var(--muted);
+      }
+
+      .sample-lines {
+        position: absolute;
+        left: 32px;
+        right: 32px;
+        bottom: 20px;
+      }
+
+      .sample-line {
+        height: 12px;
+        margin: 8px 0;
+        border: 2px solid var(--ink);
+        background: var(--orange);
+        border-radius: 999px;
+      }
+
+      .sample-line:nth-child(1) {
+        width: 92%;
+      }
+
+      .sample-line:nth-child(2) {
+        width: 74%;
+        background: var(--brown);
+      }
+
+      .sample-line:nth-child(3) {
+        width: 86%;
+        background: #fffaf0;
+      }
+
+      .promo-marquee {
+        padding: 58px 84px;
+        background: var(--ink);
+      }
+
+      .marquee-card {
+        width: 100%;
+        height: 100%;
+        border: 5px solid #fffaf0;
+        background: linear-gradient(135deg, var(--paper), #ecdcc8);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .marquee-card .promo-icon {
+        left: 92px;
+        top: 94px;
+        width: 172px;
+        height: 172px;
+        border-radius: 36px;
+      }
+
+      .marquee-card h1 {
+        position: absolute;
+        left: 310px;
+        top: 98px;
+        margin: 0;
+        font-size: 74px;
+        line-height: 1;
+      }
+
+      .marquee-card p {
+        position: absolute;
+        left: 316px;
+        top: 198px;
+        margin: 0;
+        font-size: 32px;
+        line-height: 1.5;
+        font-weight: 800;
+        color: var(--muted);
+      }
+
+      .marquee-lines {
+        position: absolute;
+        left: 92px;
+        right: 92px;
+        bottom: 74px;
+      }
+
+      .marquee-lines .sample-line {
+        height: 22px;
+        margin: 16px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="asset">
+      <section class="screen screen-one">
+        <div class="topline">
+          <div class="brand-icon"></div>
+          <div>
+            <h1 class="brand-title">読みづらいページを、すぐ読みやすく</h1>
+            <p class="brand-subtitle">プリセットを選ぶだけで文字スタイルを一括調整</p>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="browser">
+            <div class="browser-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <div class="urlbar">https://example.com/article</div>
+            </div>
+            <div class="article after">
+              <span class="article-label">適用後</span>
+              <h2>長い記事も、文字サイズ・行間・太さをそろえて読みやすく。</h2>
+              <p>
+                サイトごとに異なるフォントや小さな文字を、自分に合った表示へ変更できます。
+                設定は保存され、次に開くページにも同じ読みやすさを適用できます。
+              </p>
+              <p>
+                行間と文字間隔も調整できるため、文章の密度を下げて視線を追いやすくできます。
+              </p>
+              <p>
+                コードや一部のアイコンフォントは除外し、ページの使いやすさを保ちます。
+              </p>
+            </div>
+          </div>
+
+          <aside class="popup">
+            <h3>スタイル変更</h3>
+            <div class="switch-card">
+              <div class="switch-row">
+                <span>スタイル適用</span>
+                <span class="switch"></span>
+              </div>
+            </div>
+            <div class="center"><span class="status">適用中</span></div>
+            <div class="site-card">example.com<br /><span class="checkbox"></span>このサイトでは無効</div>
+            <div class="settings-card">
+              <div class="field">
+                <label>プリセット</label>
+                <div class="select">読みやすさ重視</div>
+              </div>
+              <div class="field">
+                <label>フォント</label>
+                <div class="select">ゴシック体</div>
+              </div>
+              <div class="field">
+                <label>サイズ</label>
+                <div class="range"><span class="track"></span><b>18px</b></div>
+              </div>
+              <div class="field">
+                <label>行間</label>
+                <div class="range"><span class="track"></span><b>1.7</b></div>
+              </div>
+              <div class="field">
+                <label>文字間隔</label>
+                <div class="range"><span class="track"></span><b>0.3px</b></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="screen screen-two">
+        <div class="topline">
+          <div class="brand-icon"></div>
+          <div>
+            <h1 class="brand-title">変更前・変更後をひと目で比較</h1>
+            <p class="brand-subtitle">小さい文字や詰まった行間を、自分の読みやすい表示へ</p>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="browser mini-browser">
+            <div class="browser-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <div class="urlbar">Before</div>
+            </div>
+            <div class="article before">
+              <span class="article-label">適用前</span>
+              <h2>サイトごとに文字の見え方が違う</h2>
+              <p>
+                Some websites use compact text, tight line height, and a low contrast font.
+                Long articles can become hard to follow when every page uses a different style.
+              </p>
+              <p>
+                Navigation, sidebars, and content areas often compete for attention, making it
+                difficult to focus on the main text.
+              </p>
+              <p>
+                A single readable style can reduce friction when moving between pages.
+              </p>
+            </div>
+          </div>
+
+          <div class="browser mini-browser">
+            <div class="browser-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <div class="urlbar">After</div>
+            </div>
+            <div class="article after">
+              <span class="article-label">適用後</span>
+              <h2>見やすい文字スタイルをすぐ適用</h2>
+              <p>
+                フォント、文字サイズ、太さ、行間、文字間隔をまとめて調整できます。
+              </p>
+              <p>
+                プリセットから始めて、必要に応じて自分向けに細かく変更できます。
+              </p>
+              <p>
+                設定はブラウザ内に保存され、外部サーバーへ送信されません。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature"><strong>プリセット</strong><span>読みやすさ重視、大きめ、太め、等幅</span></div>
+          <div class="feature"><strong>行間</strong><span>文章の密度を下げて目で追いやすく</span></div>
+          <div class="feature"><strong>文字間隔</strong><span>文字同士の詰まりを調整</span></div>
+          <div class="feature"><strong>ローカル保存</strong><span>設定はブラウザ内に保持</span></div>
+        </div>
+      </section>
+
+      <section class="screen screen-three">
+        <div class="topline">
+          <div class="brand-icon"></div>
+          <div>
+            <h1 class="brand-title">崩れるサイトでは、サイト別にオフ</h1>
+            <p class="brand-subtitle">全体設定は残したまま、特定サイトだけ適用を止められます</p>
+          </div>
+        </div>
+
+        <div class="site-demo">
+          <div class="message">
+            <h2>すべてのページで同じ設定。必要なサイトだけ例外に。</h2>
+            <p>
+              Webアプリや管理画面など、文字の上書きで見た目が崩れるサイトでは
+              「このサイトでは無効」を選ぶだけで適用を停止できます。
+            </p>
+            <p>
+              外部通信なしで、無効化したホスト名だけをブラウザ内に保存します。
+            </p>
+            <div class="pill-list">
+              <span class="pill">全体ON</span>
+              <span class="pill">サイト別OFF</span>
+              <span class="pill">リロード不要</span>
+            </div>
+          </div>
+
+          <aside class="popup">
+            <h3>スタイル変更</h3>
+            <div class="switch-card">
+              <div class="switch-row">
+                <span>スタイル適用</span>
+                <span class="switch"></span>
+              </div>
+            </div>
+            <div class="center"><span class="status" style="background: var(--muted)">このサイトは無効</span></div>
+            <div class="site-card">app.example.com<br /><span class="checkbox"></span>このサイトでは無効</div>
+            <div class="settings-card">
+              <div class="field"><label>プリセット</label><div class="select">大きめ</div></div>
+              <div class="field"><label>サイズ</label><div class="range"><span class="track"></span><b>22px</b></div></div>
+              <div class="field"><label>太さ</label><div class="select">500</div></div>
+              <div class="field"><label>行間</label><div class="range"><span class="track"></span><b>1.8</b></div></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="promo promo-small">
+        <div class="promo-card">
+          <div class="promo-icon"></div>
+          <h1>Style<br />Changer</h1>
+          <p>読みやすい<br />文字スタイルへ</p>
+          <div class="sample-lines">
+            <div class="sample-line"></div>
+            <div class="sample-line"></div>
+            <div class="sample-line"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="promo promo-marquee">
+        <div class="marquee-card">
+          <div class="promo-icon"></div>
+          <h1>Style Changer</h1>
+          <p>Webページの文字を、自分に読みやすい表示へ。</p>
+          <div class="marquee-lines">
+            <div class="sample-line"></div>
+            <div class="sample-line"></div>
+            <div class="sample-line"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      document.documentElement.dataset.asset = params.get("asset") || "screenshot1";
+    </script>
+  </body>
+</html>
